@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mini API Lab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --accent: #22c55e;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #020617, #0f172a);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    h1 {
+      margin-bottom: 6px;
+      font-size: 1.8rem;
+    }
+
+    p {
+      color: var(--muted);
+      margin-top: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    label {
+      display: block;
+      margin-top: 14px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    input, textarea, select, button {
+      width: 100%;
+      margin-top: 6px;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: #020617;
+      color: var(--text);
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+      font-family: monospace;
+    }
+
+    button {
+      margin-top: 18px;
+      background: var(--accent);
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    pre {
+      background: #020617;
+      padding: 14px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      margin-top: 10px;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 0.85rem;
+    }
+
+    .success { color: var(--accent); }
+    .error { color: var(--danger); }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Mini API Lab</h1>
+    <p>Single-file REST API tester • No dependencies • Instant execution</p>
+
+    <div class="card">
+      <label>HTTP Method</label>
+      <select id="method">
+        <option>GET</option>
+        <option>POST</option>
+        <option>PUT</option>
+        <option>DELETE</option>
+      </select>
+
+      <label>Request URL</label>
+      <input id="url" placeholder="https://jsonplaceholder.typicode.com/users" />
+
+      <label>JSON Body (optional)</label>
+      <textarea id="body" placeholder='{ "name": "John" }'></textarea>
+
+      <button onclick="sendRequest()">Send Request</button>
+
+      <div class="status" id="status"></div>
+      <pre id="response">// Response will appear here</pre>
+    </div>
+
+    <footer>
+      Built as a single HTML innovation sandbox
+    </footer>
+  </div>
+
+  <script>
+    async function sendRequest() {
+      const method = document.getElementById("method").value;
+      const url = document.getElementById("url").value;
+      const bodyInput = document.getElementById("body").value;
+      const responseBox = document.getElementById("response");
+      const statusBox = document.getElementById("status");
+
+      responseBox.textContent = "Loading...";
+      statusBox.textContent = "";
+
+      try {
+        const options = {
+          method,
+          headers: { "Content-Type": "application/json" }
+        };
+
+        if (method !== "GET" && bodyInput.trim()) {
+          options.body = bodyInput;
+        }
+
+        const res = await fetch(url, options);
+        const data = await res.json();
+
+        statusBox.textContent = `Status: ${res.status}`;
+        statusBox.className = "status success";
+        responseBox.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        statusBox.textContent = "Request failed";
+        statusBox.className = "status error";
+        responseBox.textContent = err.message;
+      }
+    }
+  </script>
+</body>
+</html>
